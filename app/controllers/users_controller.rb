@@ -10,12 +10,18 @@ class UsersController < ApplicationController
 
 	def show
 		@user = User.find(params[:id])
+		@microposts = @user.microposts.paginate(:page => params[:page])
 		@title = @user.name
 	end
 	
 	def new
-		@user = User.new
-		@title = "Sign up"
+		unless signed_in?
+			@user = User.new
+			@title = "Sign up"
+		else
+			flash[:info] = "You're already have an account!"
+			redirect_to root_path
+		end
 	end
 	
 	def create
@@ -48,16 +54,21 @@ class UsersController < ApplicationController
 	end
 	
 	def destroy
-		User.find(params[:id]).destroy
-		flash[:success] = "User destroyed."
+		user = User.find(params[:id])
+		unless current_user?(user)
+			user.destroy
+			flash[:success] = "User destroyed."
+		else
+			flash[:error] = "You cannot delete yourself!"
+		end
 		redirect_to users_path
 	end
 	
 	private
 	
-		def authenticate
-			deny_access unless signed_in?
-		end
+		# def authenticate
+		#	deny_access unless signed_in?
+		# end
 		
 		def correct_user
 			@user = User.find(params[:id])
