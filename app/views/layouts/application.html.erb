@@ -5,6 +5,17 @@
 		<%= csrf_meta_tag %>
 		<%= render 'layouts/stylesheets' %>
 		<%= javascript_include_tag :defaults %>
+		<% if signed_in? %>
+			<script>
+				function textCounter(textarea, countdown, maxlimit) {
+					textareaid = document.getElementById(textarea);
+					if (textareaid.value.length > maxlimit)
+						textareaid.value = textareaid.value.substring(0, maxlimit);
+					else
+						document.getElementById(countdown).value = '('+(maxlimit-textareaid.value.length)+' characters available)';
+				}
+			</script>
+		<% end %>
 	</head>
 	<body>
 		<div class="container">
